@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge"> 
+		<meta name="viewport" content="width=device-width, initial-scale=1"> 
+		<title>COV-ID</title>
+		<link rel="stylesheet" type="text/css" href="css/normalize.css" />
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+		<link rel="stylesheet" type="text/css" href="css/demo.css" />
+		<link rel="stylesheet" type="text/css" href="css/effect1.css" />
+		<link rel="stylesheet" href="css/style.css">
+		<script src="js/modernizr.custom.js"></script>
+	</head>
+	<body class="demo-1">
+		<div id="ip-container" class="ip-container">
+			<!-- initial header -->
+			<header class="ip-header">
+				<div class="ip-loader">
+					<center><img src="covid.png" class="img-fluid" alt="Responsive image" width="250px" height="250px"></center><br><br><br><br><br>
+					<svg class="ip-inner" width="60px" height="60px" viewBox="0 0 80 80">
+						<path class="ip-loader-circlebg" d="M40,10C57.351,10,71,23.649,71,40.5S57.351,71,40.5,71 S10,57.351,10,40.5S23.649,10,40.5,10z"/>
+						<path id="ip-loader-circle" class="ip-loader-circle" d="M40,10C57.351,10,71,23.649,71,40.5S57.351,71,40.5,71 S10,57.351,10,40.5S23.649,10,40.5,10z"/>
+					</svg>
+				</div>
+			</header>
+			<br>
+      <br>
+    <center>
+        <!--<img src="banner.png" class="img-fluid" alt="Responsive image">-->
+		<div>
+			<img src="covid-banner.png" class="img-fluid" alt="Responsive image" width="250px" height="250px">
+        </div>
+        <br>
+        <div class="container">
+            <h3 class="title-text">Pilih Provinsi</h3>
+            <select id="provinsi" class="form-control">
+                <option>Pilih</option>
+            </select>
+            <div class="positif">
+                <h3 class="text-header">Positif</h3><br>
+                <h1 id="aktif"></h1>
+            </div>
+            <div class="sembuh">
+                <h3 class="text-header">Sembuh</h3><br>
+                <h1 id="sembuh"></h1>
+            </div>
+            <div class="meninggal">
+                <h3 class="text-header">Meninggal</h3><br>
+                <h1 id="kematian"></h1>
+            </div>
+            <div class="footer">
+                <h6><b>Crafted by @ilhambagasaputra</b></h6>
+            </div>
+
+        </div>
+        
+
+    </center>
+    
+
+    <!-- Optional JavaScript -->
+    <script>
+        const main = () => {
+      const id = (v) => document.getElementById(`${v}`);
+
+      //mengatur keadaan value
+      const useState = (init) => {
+        let _val = init;
+        const state = () => _val;
+        const setState = (newVal) => {
+          _val = newVal;
+        };
+        return [state, setState];
+      };
+
+      //inisialisasi keadaan
+      const [semua, setSemua] = useState(null);
+      const [p, a, s, k] = [
+        id("provinsi"),
+        id("aktif"),
+        id("sembuh"),
+        id("kematian"),
+      ];
+
+      //Perubahan data berdasarkan option
+      p.onchange = () => {
+        let [id, data] = [p.value, semua()];
+        let endData = id == "indonesia" ? 0 : data[id].attributes; //mendapatkan data provinsi berdasar array
+
+        const {
+          Kasus_Posi,
+          Kasus_Semb,
+          Kasus_Meni
+        } = endData; // memecah objek jadi variabel
+        const [pos, sem, men] = [
+          id == "indonesia" ? 0 : Kasus_Posi,
+          id == "indonesia" ? 0 : Kasus_Semb,
+          id == "indonesia" ? 0 : Kasus_Meni,
+        ]; //memecah if else
+
+        a.innerHTML = pos;
+        s.innerHTML = sem;
+        k.innerHTML = men;
+      };
+
+      //default option
+      const optEl = document.createElement("option");
+      optEl.text = `Pilih provinsi`;
+      optEl.selected = true;
+      optEl.value = "indonesia";
+      p.add(optEl);
+
+      //fungsi default es6 untuk memanggil API, dan mengambil data json dari kawalcorona
+      fetch(`https://api.kawalcorona.com/indonesia/provinsi/`)
+        .then((res) => res.json())
+        .then((data) => {
+          //setData
+          setSemua(data);
+          loop(data);
+        });
+
+      //memetakan data json berdasarkan kode provinsi dan provinsi
+      const loop = (data) => {
+        for (let c in data) {
+          const hasil = data[c].attributes.Provinsi; //mengakses data json berdasarkan provinsi
+
+          //membuat element option berdasarkan hasil pemetaan data
+          const optEl = document.createElement("option");
+          optEl.text = `${hasil}`;
+          optEl.value = `${c}`;
+          p.add(optEl); //menambahkan element ke id yang telah di get dari html
+        }
+      };
+    };
+
+    //Mengakses fungsi ketika DOM ketika file html berjalan
+    document.addEventListener("DOMContentLoaded", main);
+    </script>
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+			
+		</div><!-- /container -->
+		<script src="js/classie.js"></script>
+		<script src="js/pathLoader.js"></script>
+		<script src="js/main.js"></script>
+	</body>
+</html>
